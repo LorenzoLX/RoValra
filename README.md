@@ -1,8 +1,6 @@
 # RoValra
 - **Only Official Website https://rovalra.com**
 
-- **ROREGION IS NOT MADE OR CONTROLLED BY ME, THEY ARE USING ROVALRAS SOURCE CODE FOR THEIR EXTENSION**
-
 <a href="https://chromewebstore.google.com/detail/RoValra%20-%20Roblox%20Improved/njcickgebhnpgmoodjdgohkclfplejli" title="Available in the Chrome Web Store"><img src="/Assets/ChromeWebStore_BadgeWBorder_v2_206x58.png" alt="Available in the Chrome Web Store"></a>\
 <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/NotValra/RoValra/total">
 - **If you like this project, consider giving it a star⭐, it really helps!**
@@ -23,19 +21,27 @@
 
 # Features
 - **Games**
+    - **Server Uptime**
+    - **Server list filter**
+    - **Server version**
+    - **Shows the current version a game is on**
+    - **Shows the oldest version of a game an active server is running**
+    - **Shows Total Servers in a game**
+    - **Shows A servers region and uptime in the server list**
     - **Join preffered region play button**
     - **Shows hidden games on profiles and groups**
     - **Join a server in a specific region**
     - **Shows Subplaces of a game**
     - **Universal game invitation link**
-    - **Universal user sniper that does not require you to be friends with them (PATCHED)**
     - **Bot detector, shows if a game is botted**
     - **Shows full server id in the server list**
-    - **Copy deeplink for friends servers and shows if they are playing in a private server**
+    - **Copy deeplink for friends servers**
+    - **Bulk setting private servers inactive or active.**
+    - **Quick play button, with preferred region support.**
     - **Quick invite link copy for private servers**
     - **Quick Regenarate invite link for private servers**
 - **Catalog**
-    - **Hidden catalog, which allows you to view Roblox made items before they are on the official catalog.**     
+    - **Hidden catalog, which allows you to view Roblox made items before they are on the official catalog. (PATCHED 😭)**     
     - **Shows sales and revenue on specific items.**
 - **Profile**
   - <details>
@@ -50,9 +56,9 @@
   
 - **Avatar**
     - **Remove R6 Warning**
-    - **R6 Fix. Stops Roblox from automatically switching your character to R15 when equipping dynamic heads.**
 - **Misc**
     - **Shows an estimated for how many Robux will stop pending within 24 hours**
+    - **CSS Fixes for the Roblox Website**
 - **Fun stuff**
     - **All ban reasons on Roblox**
     - **All ban durations on Roblox**
@@ -91,7 +97,8 @@
 - [x] **~~Feature showing if a game is botted or not~~ ADDED**
 - [x] **~~Fixing the invite system~~ ADDED**
 - [x] **~~Roblox server list improvements~~ ADDED**
-- [ ] **Big region selector improvements and server uptime**
+- [x] **~~Big region selector improvements and server uptime~~ ADDED**
+- [ ] **Reworking a lot of how the extension functions for future proofing**
 - [x] **~~FireFox support~~ ADDED**
 
 # Browser Compatibility
@@ -136,6 +143,6 @@
   
 - **Extensions logo is gilbert, which is a fish I caught in [Fisch](https://www.roblox.com/games/16732694052/Fisch)**
 - **7_lz on dc helped me a lot with the process of switching away from third party APIs by providing me with the json and just general help**
-- **Thanks to Julia for creating a Github repo that documented all the Roblox datacenter ips, which i now use for my region selector https://github.com/RoSeal-Extension/Top-Secret-Thing**
+- **Thanks to Julia for creating a Github repo that documented all the Roblox datacenter ips, which I used to use for my region selector https://github.com/RoSeal-Extension/Top-Secret-Thing**
 - **Credit to coweggs on dc for coming up with the name RoValra, it was just too funny I had to use it**
 - **Credit to AromaXR for implementing Firefox support**

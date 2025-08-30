@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "RoValra - Roblox Improved",
-  "version": "2.2.1",
+  "version": "2.3.1.6",
   "description": "An extension aiming to provide features that other Roblox extensions pay wall!",
   "content_scripts": [    {
       "matches": [
@@ -15,7 +15,7 @@
         "*://*.roblox.com/*/games/*",
         "*://*.roblox.com/games/*"
       ],
-      "js": ["Games/serverid.js",  "Games/serverlistener.js",  "Games/botDetector.js" ],
+      "js": ["Games/serverid.js",  "Games/serverlistener.js",  "Games/botDetector.js"],
       "run_at": "document_start",
       "all_frames": true
     },    {
@@ -31,7 +31,7 @@
          "*://*.roblox.com/*/games/*",
         "*://*.roblox.com/games/*"
       ],
-      "js": ["Games/Regions_content.js", "Games/RegionPlayButton.js", "Games/Regions_contentSimple.js"],
+      "js": ["Games/RegionPlayButton.js", "Games/Regions_contentSimple.js", "Games/serveruptime.js" ],
       "run_at": "document_end",
       "all_frames": true
     },
@@ -39,7 +39,7 @@
       "matches": [
         "*://*.roblox.com/*"
       ],
-      "js": ["Games/revertlogo.js"],
+      "js": ["Games/revertlogo.js", "Games/quickplay.js"],
       "run_at": "document_end",
       "all_frames": true
     },
@@ -48,14 +48,32 @@
          "*://*.roblox.com/*/users/*",
         "*://*.roblox.com/users/*"
       ],
-      "js": ["misc/ItemChecker.js"],
+      "js": ["misc/ItemChecker.js", "Profile/RoValraBadges.js", "Profile/privateserver.js"],
       "run_at": "document_end",
+      "all_frames": true
+    },
+     {
+      "matches": [
+         "*://*.roblox.com/*/users/*",
+        "*://*.roblox.com/users/*"
+      ],
+      "js": ["misc/cssfixes.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    },
+    {
+      "matches": [
+         "*://*.roblox.com/*/catalog/*",
+        "*://*.roblox.com/catalog/*"
+      ],
+      "js": ["misc/40method.js"],
+      "run_at": "document_start",
       "all_frames": true
     }
   ],  "permissions": [
     "declarativeNetRequest",
     "storage",
-    "tabs",
+    
     "scripting"
   ],
   "browser_specific_settings": {
@@ -98,11 +116,9 @@
               "misc/utils.js",
               "Games/Regions_content.js",
               "Games/Subplaces.js",
-              "data/ServerList.json",
               "data/items.json",
               "data/countries.json",
               "Avatar/R6Warning.js",
-              "Avatar/R6Fix.js",
               "settings.js",
               "Assets/icon-128.png",
               "Games/invite.js",
@@ -114,7 +130,21 @@
               "misc/pendingRobuxTrans.js",
               "Games/botDetector.js",
               "Games/inject.js",
-              "Games/invite.js"
+              "Games/invite.js",
+              "Games/serveruptime.js",
+              "data/Three.js",
+              "data/OrbitControls.js",
+              "data/globe_initializer.js" ,
+              "data/map_dark.png",
+              "data/map_light.png",
+              "Assets/RegionSelectorPicture.png",
+              "misc/cssfixes.js",
+              "data/ServerList.json",
+              "misc/40method.js",
+              "Games/quickplay.js",
+              "Profile/RoValraBadges.js",
+              "Assets/return_request.png",
+              "Assets/fishstrap.png"
           ],
           "matches": [
               "https://www.roblox.com/*"

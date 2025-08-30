@@ -1,7 +1,61 @@
 let trackedServerRequests = [];
 let loadedScripts = [];
 let roValraLoaded = false;
+async function loadServerIpMap() {
+    if (window.rovalraDatacenterState) return;
+    window.rovalraDatacenterState = 'loading_fallback';
+    const processAndStoreData = (serverListData) => {
+        let dataElement = document.getElementById('rovalra-datacenter-data-storage');
+        if (!dataElement) {
+            dataElement = document.createElement('script');
+            dataElement.id = 'rovalra-datacenter-data-storage';
+            dataElement.type = 'application/json';
+            (document.head || document.documentElement).appendChild(dataElement);
+        }
+        dataElement.textContent = JSON.stringify(serverListData);
 
+        const map = {};
+        if (Array.isArray(serverListData)) {
+            serverListData.forEach(dc => {
+                if (dc.dataCenterIds && Array.isArray(dc.dataCenterIds) && dc.location) {
+                    dc.dataCenterIds.forEach(id => {
+                        map[id] = dc.location;
+                    });
+                }
+            });
+        }
+        serverIpMap = map;
+    };
+
+    try {
+        const fallbackUrl = chrome.runtime.getURL('data/ServerList.json');
+        const fallbackResponse = await fetch(fallbackUrl);
+        if (!fallbackResponse.ok) throw new Error(`Status: ${fallbackResponse.status}`);
+        const localData = await fallbackResponse.json();
+        processAndStoreData(localData);
+        window.rovalraDatacenterState = 'fallback_loaded';
+    } catch (e) {
+        console.error("Could not load local fallback ServerList.json", e);
+            serverIpMap = {};
+    }
+
+    window.rovalraDatacenterState = 'fetching_api';
+    const API_TIMEOUT = 8000;
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+        // You are allowed to use this API for personal projects only which is limited to open source projects on GitHub, they must be free and you must credit the RoValra repo.
+        // You are not allowed to use the API for projects on the chrome web store or any other extension store. If you want to use the API for a website dm be on discord: Valra and we can figure something out.
+        // If you want to use the API for something thats specifically said isnt allowed or you might be unsure if its allowed, please dm me on discord: Valra, Ill be happy to check out your stuff and maybe allow you to use it for your project.
+        const apiResponse = await fetch('https://apis.rovalra.com/datacenters', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!apiResponse.ok) throw new Error(`API returned status: ${apiResponse.status}`);
+        const apiData = await apiResponse.json();
+        processAndStoreData(apiData);
+    } catch (e) {} finally {
+        window.rovalraDatacenterState = 'complete';
+    }
+}
 const URL_MATCHERS = {
     CATALOG: /^\/(?:[a-z]{2}\/)?catalog/,
     BUNDLES: /^\/(?:[a-z]{2}\/)?bundles/,
@@ -17,8 +71,8 @@ const PAGE_SETTINGS_MAP = {
     BUNDLES: ['itemSalesEnabled'],
     COMMUNITIES: ['groupGamesEnabled', 'pendingRobuxEnabled'],
     USERS: ['userGamesEnabled', 'userSniperEnabled'],
-    GAMES: ['subplacesEnabled', 'universalSniperEnabled', 'inviteEnabled'],
-    AVATAR: ['forceR6Enabled', 'fixR6Enabled'],
+    GAMES: ['subplacesEnabled', 'universalSniperEnabled', 'inviteEnabled', "serverUptimeServerLocationEnabled", "ServerlistmodificationsEnabled", "TotalServersEnabled", "ServerFilterEnabled"],
+    AVATAR: ['forceR6Enabled'],
     TRANSACTIONS: ['pendingRobuxEnabled']
 };
 
@@ -42,10 +96,10 @@ const addPreloadHints = () => {
         'HiddenGames/user_games.js',
         'HiddenGames/group_games.js',
         'Avatar/R6Warning.js',
-        'Avatar/R6Fix.js',
         'misc/userSniper.js',
         'misc/item_sales_content.js',
         'misc/pendingRobux.js',
+        //'misc/40method.js',
     ];
     
     const modulePreloadScripts = [
@@ -116,6 +170,14 @@ const loadScript = async (src, dataAttributes = {}) => {
 // Getting the theme is totally not all over the place in this extension trust me bro
 // COFFEEEEEEEEEEE
 const detectTheme = async () => {
+    await new Promise(resolve => {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', resolve, { once: true });
+        } else {
+            resolve();
+        }
+    });
+
     try {
         const response = await fetch('https://accountsettings.roblox.com/v1/themes/user', {
             credentials: 'include'
@@ -169,20 +231,15 @@ function getPlaceIdFromUrl() {
     
     const requiredSettings = pathType ? PAGE_SETTINGS_MAP[pathType] : [];
     const defaultSettings = {
-        hiddenCatalogEnabled: true,
+        hiddenCatalogEnabled: false,
         itemSalesEnabled: true,
         groupGamesEnabled: true,
         userGamesEnabled: true,
         userSniperEnabled: false,
-        universalSniperEnabled: true,
-        regionSelectorEnabled: true,
+        universalSniperEnabled: false,
         subplacesEnabled: true,
         forceR6Enabled: true,
-        fixR6Enabled: false,
         inviteEnabled: true,
-        regionSelectorInitialized: false,
-        regionSelectorFirstTime: true,
-        regionSimpleUi: false,
         pendingRobuxEnabled: true,
         PreferredRegionEnabled: true,
         privateInventoryEnabled: true,
@@ -192,6 +249,18 @@ function getPlaceIdFromUrl() {
         enableFriendservers: true,
         privateserverlink: true,
         pendingrobuxtrans: true,
+        serverUptimeServerLocationEnabled: true,
+        ServerlistmodificationsEnabled: true,
+        TotalServersEnabled: true,
+        ServerFilterEnabled: true,
+        cssfixesEnabled: true,
+        SaveRobuxEnabled: false,
+        RoValraBadgesEnable: true,
+        ShowBadgesEverywhere: false,
+        QuickPlayEnable: true,
+        PrivateServerBulkEnabled: true,
+        GameVersionEnabled: true,
+        OldestVersionEnabled: true
     };
 
     const settingsToLoad = {
@@ -231,6 +300,10 @@ function getPlaceIdFromUrl() {
             if (settings.itemSalesEnabled) {
                 scriptPromises.push(loadScript('misc/item_sales_content.js', { itemsUrl: chrome.runtime.getURL('data/items.json') }));
             }
+           /* if (settings.SaveRobuxEnabled) {
+                scriptPromises.push(loadScript('misc/40method.js'));
+
+            }*/
             break;
         case 'COMMUNITIES':
             if (settings.groupGamesEnabled) {
@@ -265,9 +338,7 @@ function getPlaceIdFromUrl() {
             if (settings.forceR6Enabled) {
                 scriptPromises.push(loadScript('Avatar/R6Warning.js'));
             }
-            if (settings.fixR6Enabled) {
-                scriptPromises.push(loadScript('Avatar/R6Fix.js'));
-            }
+          
             break;
         case 'TRANSACTIONS':
             if (settings.pendingrobuxtrans) {
@@ -286,7 +357,7 @@ function getPlaceIdFromUrl() {
 
     const loadEndTime = performance.now();
     const totalLoadDuration = (loadEndTime - loadStartTime).toFixed(2);
-
+    loadServerIpMap()
     console.log(
         "%cRoValra",
         "font-size: 3em; color: #FF4500;",
