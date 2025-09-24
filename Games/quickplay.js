@@ -497,8 +497,9 @@ function processDataPayload(data) {
                         playButton.onclick = (e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            const match = gameLink.href.match(/games\/(\d+)/);
-                            if (match ?.[1]) launchGame(match[1]);
+                            const match = gameLink.href.match(/(?:\/games\/(\d+)\/)|(?:[?&]PlaceId=(\d+))/);
+                            const matchedPlaceId = match ? (match[1] || match[2]) : null;
+                            if (matchedPlaceId) launchGame(matchedPlaceId);  
                         };
                         buttonsWrapper.appendChild(playButton);
 
@@ -509,15 +510,17 @@ function processDataPayload(data) {
                             serverButton.onclick = async (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                const match = gameLink.href.match(/games\/(\d+)/);
-                                if (!match ?.[1]) return;
+                                // regex that supports both /games/PLACEID/ and https://www.roblox.com/games/refer?PlaceId=PLACEID
+                                const match = gameLink.href.match(/(?:\/games\/(\d+)\/)|(?:[?&]PlaceId=(\d+))/);
+                                const matchedPlaceId = match ? (match[1] || match[2]) : null;
+                                if (!matchedPlaceId) return;
                                 try {
                                     await dataPromise;
                                     const {
                                         [PREFERRED_REGION_STORAGE_KEY]: savedRegion
                                     } = await chrome.storage.local.get(PREFERRED_REGION_STORAGE_KEY);
                                     if (savedRegion && REGIONS[savedRegion]) {
-                                        performJoinAction(match[1], savedRegion);
+                                    performJoinAction(matchedPlaceId, savedRegion);
                                     } else {
                                         showRegionSelectionModal();
                                     }
@@ -596,4 +599,5 @@ function processDataPayload(data) {
         // hard coding was not a good idea... It worked out ig wow wee woo i cnat wait to spent years future proofing the extension AHHHHH
         waitForElement('#games-carousel, .game-home-page-container, #game-discovery-page, .game-grid, .games-list-container, .container-list.games-detail, .group-experiences-container, .hlist.game-cards', initializeQuickPlay);
     }
+
 });
